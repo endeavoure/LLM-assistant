@@ -1,5 +1,6 @@
 import transformers
 import torch
+from torch import nn
 from torch.utils.data import Dataset, DataLoader, Sampler
 from typing import Dict, Sequence, List, Iterator, Tuple
 
@@ -21,6 +22,49 @@ class GPTWrapper:
         generated_tokens = self.model.generate(**inputs, **generation_kwargs)
         return self.tokenizer.decode(generated_tokens[0])
     
+    def train_n_save(model, train_texts, learning_rate: float = 3e-4, N_ITERATIONS: int = 100):
+        device = 'mps'
+        model.model.to(device)
+
+        loss = nn.CrossEntropyLoss()
+        optimizer = torch.optim.Adam(params=model.model.parameters(), lr= 0.0000001)
+        cur_iteration = 0
+        loss_values = []
+
+        train_batch = SupervisedDataset(
+            dataset=train_texts[['prompt', 'original_response']].values,
+            tokenizer=model.tokenizer,
+        )
+
+        train_batch_loader = DataLoader(
+            dataset=train_batch,
+            batch_size=1,
+            shuffle=False,
+        )
+
+        for x in train_batch_loader:
+            if cur_iteration == N_ITERATIONS:
+                break
+            model.model.train()
+            input_tokens = x['input_ids'].to(device)
+            attention_mask = x['input_att_mask'].to(device)
+            labels = x['labels'].clone().to(device)
+            out_logits = model.model(input_ids=input_tokens, attention_mask=attention_mask).logits
+            labels[labels == 60000] = -100
+
+            loss_value = loss(out_logits.permute(0, 2, 1), labels)
+            print(f"Loss value: {loss_value.item()}, Iteration: {cur_iteration}")
+            loss_value.backward()
+            optimizer.step()
+
+            model.model.eval()
+            cur_iteration += 1
+            loss_values.append(loss_value.cpu().detach().numpy())
+        torch.save(model.model.state_dict(), 'models/gpt_lm/model.pkl')
+        model.model.to('cpu')
+
+        return loss_values
+
 # этот класс нужен для предобработки датасета на котором обучаем
 class SupervisedDataset(Dataset):
     """Dataset for supervised fine-tuning."""

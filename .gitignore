@@ -11,3 +11,4 @@ config.py
 models/stat_lm/stat_lm.pkl
 models/stat_lm/tokenizer.pkl
 models/gpt_lm/model.pkl
+logs/bot.log

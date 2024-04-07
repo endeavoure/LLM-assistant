@@ -20,7 +20,7 @@ class ModelWrapper:
         try:
             # ['StatLM', 'GPT', 'Llama']
             if model_name == 'StatLM':
-                self.model, self.generate_kwargs = ngram_model.construct_model()
+                self.model, self.generate_kwargs = stat_model.construct_model()
             elif model_name == 'GPT':
                 self.model, self.generate_kwargs = gpt_lm.construct_model()
             else:
