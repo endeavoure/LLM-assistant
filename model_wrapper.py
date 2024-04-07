@@ -1,6 +1,6 @@
 import pickle
-
-import ngram_model
+import gpt_lm
+import stat_model
 
 class ModelWrapper:
     """
@@ -21,8 +21,11 @@ class ModelWrapper:
             # ['StatLM', 'GPT', 'Llama']
             if model_name == 'StatLM':
                 self.model, self.generate_kwargs = ngram_model.construct_model()
+            elif model_name == 'GPT':
+                self.model, self.generate_kwargs = gpt_lm.construct_model()
             else:
                 return False, f"Модель {model_name} еще не поддерживается"
+            
         except Exception as e:
             return False, f"Error while loading model {model_name}: {e}"
 

@@ -6,11 +6,8 @@
 /include
 /lib
 /share
-asisstant_1.ipynb
 config.py
-gpt_lm.py
 /ssl
-stat_lm.py
-test_gpt.ipynb
 models/stat_lm/stat_lm.pkl
 models/stat_lm/tokenizer.pkl
+models/gpt_lm/model.pkl

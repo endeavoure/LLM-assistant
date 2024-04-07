@@ -4,6 +4,7 @@ import random
 from random import choice
 from config import BOT_TOKEN
 from model_wrapper import ModelWrapper
+from datetime import datetime
 
 """
 get_text_messages - обработка любого текстового сообщения, в том числе того, что отправился при нажатии кнопки.
@@ -74,7 +75,8 @@ def get_text_messages(message):
             bot.send_message(message.from_user.id, result)
         else:
             bot.send_message(message.from_user.id, f"Проблемы с генерацией, ниже описаны ошибки.\n{result}")
-
+    # a_log = open(f'/logs/log_{message.chat.id}.txt', 'a')
+    # a_log.write(f'{datetime.now()}: {message.text}\n')
 
 bot.polling(none_stop=True, interval=0) #обязательная для работы бота часть
 # TODO: сделайте логирование запросов с указанием модели и параметров - это полезно
